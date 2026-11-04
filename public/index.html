@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1c140d">
+  <title>Kindred</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Photo behind every screen (see public/img/photos.json), aged with sepia, grain and vignette. -->
+  <div class="backdrop" aria-hidden="true">
+    <img class="backdrop-photo" id="backdrop-a" alt="">
+    <img class="backdrop-photo" id="backdrop-b" alt="">
+    <div class="grain"></div>
+    <div class="vignette"></div>
+  </div>
+  <main id="app">
+
+    <!-- 0. Street: the booth seen from outside. "Step inside" zooms into it. -->
+    <section class="screen street" id="street">
+      <div class="scene" id="scene">
+        <img class="scene-photo" id="scene-photo" alt="" hidden>
+        <div class="scene-shade"></div>
+      </div>
+      <div class="street-copy">
+        <p class="eyebrow">A telephone for the grieving</p>
+        <h1>Kindred</h1>
+        <div class="rule" aria-hidden="true"><span>✦</span></div>
+        <p class="lead">A quiet place to call someone who is grieving too.</p>
+        <button class="primary" id="step-inside">Step inside</button>
+        <button class="link credits-link" id="credits-link" hidden>Photo credits</button>
+      </div>
+    </section>
+
+    <!-- 1. Welcome: the instruction card on the phone -->
+    <section class="screen" id="welcome" hidden>
+      <div class="masthead" aria-hidden="true"><span>Kindred</span></div>
+      <div class="placard">
+      <h1>Kindred</h1>
+      <p class="lead">Talk, anonymously, with someone who is grieving too.</p>
+      <ul class="promises">
+        <li>No name, email or phone number. Ever.</li>
+        <li>You get a random name, like <em>Quiet Willow</em>.</li>
+        <li>Voice only. Calls are not recorded.</li>
+        <li>You can hang up at any moment, no explanation needed.</li>
+      </ul>
+      <p class="note">Kindred is peer support, not therapy or an emergency service.
+        Please be kind. Listen more than you advise.</p>
+      </div>
+      <button class="primary" data-go="about-loss">I understand, continue</button>
+    </section>
+
+    <!-- 2. About your loss -->
+    <section class="screen" id="about-loss" hidden>
+      <h2>Who did you lose?</h2>
+      <p class="sub">Choose all that apply. This only helps match you with others.</p>
+      <div class="chips" id="loss-chips">
+        <button class="chip" data-loss="parent">A parent</button>
+        <button class="chip" data-loss="grandparent">A grandparent</button>
+        <button class="chip" data-loss="sibling">A sibling</button>
+        <button class="chip" data-loss="child">A child</button>
+        <button class="chip" data-loss="partner">A partner or spouse</button>
+        <button class="chip" data-loss="friend">A friend</button>
+        <button class="chip" data-loss="other">Someone else</button>
+      </div>
+
+      <h2>When?</h2>
+      <div class="options" id="stage-options">
+        <button class="option" data-stage="new">
+          <strong>Recently</strong><span>Within about the last year</span></button>
+        <button class="option" data-stage="older">
+          <strong>Some time ago</strong><span>More than a year</span></button>
+      </div>
+      <button class="primary" id="save-profile" disabled>Continue</button>
+    </section>
+
+    <!-- 3. Home -->
+    <section class="screen" id="home" hidden>
+      <div class="masthead" aria-hidden="true"><span>Kindred</span></div>
+      <header class="topbar">
+        <div>
+          <span class="you-are">You are</span>
+          <strong id="my-alias">…</strong>
+        </div>
+        <button class="link" data-go="about-loss">Edit</button>
+      </header>
+
+      <div class="card line-card" id="line-card">
+        <div class="line-row">
+          <div>
+            <h3><span class="lamp" aria-hidden="true"></span>Open my line</h3>
+            <p class="sub" id="line-status">Let someone call you when they need to talk.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="available-toggle" aria-label="Open my line">
+            <span></span>
+          </label>
+        </div>
+        <p class="hint" id="line-hint" hidden>Keep this page open. We'll ring you here.</p>
+      </div>
+
+      <div class="card">
+        <h3>Call someone</h3>
+        <label class="field">I'd like to talk with someone who lost
+          <select id="filter-loss">
+            <option value="any">anyone</option>
+            <option value="parent">a parent</option>
+            <option value="grandparent">a grandparent</option>
+            <option value="sibling">a sibling</option>
+            <option value="child">a child</option>
+            <option value="partner">a partner or spouse</option>
+            <option value="friend">a friend</option>
+            <option value="other">someone else</option>
+          </select>
+        </label>
+        <label class="field">and is
+          <select id="filter-stage">
+            <option value="any">at any point in their grief</option>
+            <option value="new">new to grief, like me</option>
+            <option value="older">further along in their grief</option>
+          </select>
+        </label>
+        <div class="field">Start with
+          <div class="segmented" id="length-choice" role="radiogroup" aria-label="Call length">
+            <button role="radio" aria-checked="true" data-minutes="2">2 minutes</button>
+            <button role="radio" aria-checked="false" data-minutes="5">5 minutes</button>
+          </div>
+          <span class="tiny">You can both add more time near the end.</span>
+        </div>
+        <button class="primary" id="call-btn">Call</button>
+        <p class="sub center" id="open-count"></p>
+      </div>
+
+      <a class="crisis" href="https://findahelpline.com" target="_blank" rel="noopener">
+        In crisis or thinking of ending your life? <u>Find a free helpline near you.</u></a>
+    </section>
+
+    <!-- 4. Calling -->
+    <section class="screen center-screen" id="calling" hidden>
+      <svg class="ringer" viewBox="0 0 120 120" aria-hidden="true">
+        <!-- handset -->
+        <path d="M14 40c0-12 20-20 46-20s46 8 46 20v6c0 4-3 6-7 6H86c-4 0-6-2-6-6v-4c-6-2-13-3-20-3s-14 1-20 3v4c0 4-2 6-6 6H21c-4 0-7-2-7-6z" fill="currentColor"/>
+        <!-- body -->
+        <path d="M36 52h48l14 44c1 4-1 7-5 7H27c-4 0-6-3-5-7z" fill="currentColor"/>
+        <!-- rotary dial -->
+        <circle cx="60" cy="80" r="15" fill="#e9ecef"/>
+        <g fill="currentColor">
+          <circle cx="60" cy="69" r="2.6"/><circle cx="68" cy="72" r="2.6"/><circle cx="71" cy="80" r="2.6"/><circle cx="68" cy="88" r="2.6"/>
+          <circle cx="60" cy="91" r="2.6"/><circle cx="52" cy="88" r="2.6"/><circle cx="49" cy="80" r="2.6"/><circle cx="52" cy="72" r="2.6"/>
+        </g>
+        <circle cx="60" cy="80" r="4.5" fill="currentColor"/>
+      </svg>
+      <h2 id="calling-title">Looking for someone…</h2>
+      <p class="sub" id="calling-sub">Take a breath. This can take a moment.</p>
+      <button class="secondary" id="cancel-call">Cancel</button>
+    </section>
+
+    <!-- 5. In call -->
+    <section class="screen center-screen" id="in-call" hidden>
+      <p class="eyebrow">You're talking with</p>
+      <h2 class="peer-name" id="peer-alias">…</h2>
+      <p class="peer-detail" id="peer-detail"></p>
+      <div class="leader" id="leader" role="timer" aria-label="Time left">
+        <div class="leader-sweep" id="leader-sweep"></div>
+        <span class="timer" id="call-timer">0:00</span>
+      </div>
+      <p class="eyebrow" id="call-state">Connecting audio…</p>
+
+      <div class="extend" id="extend-box" hidden>
+        <p id="extend-text">One minute left. Want to keep talking?</p>
+        <button class="primary" id="extend-btn">Add 5 minutes</button>
+      </div>
+
+      <button class="secondary guide-open-inline" data-open-guide>Open the guide</button>
+
+      <div class="call-controls">
+        <button class="round" id="mute-btn" aria-pressed="false">Mute</button>
+        <button class="round end" id="hangup-btn">End</button>
+      </div>
+      <button class="link danger" id="report-btn">Report and block this person</button>
+    </section>
+
+    <!-- 6. After call -->
+    <section class="screen" id="after-call" hidden aria-labelledby="after-title">
+      <div class="after-top">
+        <div>
+          <h2>Still need to talk?</h2>
+          <p class="sub">You can call someone new right away.</p>
+        </div>
+        <button class="close-x" id="after-close" aria-label="Close and go home">&times;</button>
+      </div>
+      <button class="primary" id="call-again">Call someone new</button>
+
+      <div class="card after-msg">
+        <h3 id="after-title">Thank you for being here.</h3>
+        <p class="sub" id="after-sub">However that felt, reaching out took courage.</p>
+      </div>
+
+      <div class="card" id="rate-card">
+        <h3>How was this call?</h3>
+        <p class="sub">Anonymous. It only helps us make Kindred better.</p>
+        <div class="stars" id="stars" role="radiogroup" aria-label="Rate this call">
+          <button role="radio" aria-checked="false" data-stars="1" aria-label="1 star">★</button>
+          <button role="radio" aria-checked="false" data-stars="2" aria-label="2 stars">★</button>
+          <button role="radio" aria-checked="false" data-stars="3" aria-label="3 stars">★</button>
+          <button role="radio" aria-checked="false" data-stars="4" aria-label="4 stars">★</button>
+          <button role="radio" aria-checked="false" data-stars="5" aria-label="5 stars">★</button>
+        </div>
+        <p class="sub" id="rate-thanks" hidden>Thank you.</p>
+      </div>
+
+      <div class="card help-card">
+        <div class="help-head">
+          <h3>More support</h3>
+          <select id="region" aria-label="Your country"></select>
+        </div>
+        <div id="help-list"></div>
+      </div>
+
+      <button class="donate" disabled aria-disabled="true">Donate <span>Coming soon</span></button>
+    </section>
+
+    <!-- Incoming call sheet -->
+    <div class="sheet" id="incoming" hidden role="dialog" aria-labelledby="incoming-title">
+      <div class="sheet-body">
+        <p class="sub">Someone would like to talk</p>
+        <h2 id="incoming-title">…</h2>
+        <p class="peer-detail" id="incoming-detail"></p>
+        <div class="row">
+          <button class="secondary" id="decline-btn">Not right now</button>
+          <button class="primary" id="accept-btn">Answer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pull-out guide: ice breakers for callers + listening advice for receivers -->
+    <button class="guide-tab" id="guide-tab" data-open-guide aria-controls="guide" aria-expanded="false">Guide</button>
+    <div class="guide-scrim" id="guide-scrim" hidden></div>
+    <aside class="guide" id="guide" aria-label="Guide" aria-hidden="true">
+      <div class="guide-head">
+        <h2>Guide</h2>
+        <button class="link" id="guide-close">Close</button>
+      </div>
+      <div class="guide-tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-guide-tab="icebreakers">Ice breakers</button>
+        <button role="tab" aria-selected="false" data-guide-tab="listening">When someone shares</button>
+      </div>
+
+      <section class="guide-panel" id="guide-icebreakers">
+        <p class="sub">For the person calling. Start small. There's no right way to begin.</p>
+        <ul class="cards">
+          <li>"Hi, I'm not really sure what to say. Is it okay if we just talk?"</li>
+          <li>"Who did you lose? What was their name?"</li>
+          <li>"Would you tell me a little about them?"</li>
+          <li>"How has today been for you?"</li>
+          <li>"What do you miss most about them?"</li>
+          <li>"What's something people don't understand about your grief?"</li>
+          <li>"Is there a memory of them that still makes you smile?"</li>
+          <li>"I just needed to talk to someone who gets it."</li>
+        </ul>
+      </section>
+
+      <section class="guide-panel" id="guide-listening" hidden>
+        <p class="sub">For the person answering. You don't need to fix anything. Being there is enough.</p>
+        <h3>Do</h3>
+        <ul class="advice">
+          <li><strong>Let them lead.</strong> Follow where they want to go, even if it's not about grief.</li>
+          <li><strong>Leave room for silence.</strong> Count to five before you fill a pause.</li>
+          <li><strong>Say their person's name</strong> if you know it. Many people long to hear it.</li>
+          <li><strong>Reflect back</strong> what you hear: "That sounds exhausting." "You really loved her."</li>
+          <li><strong>Share a little of your own story</strong> only if it helps them feel less alone, then turn back to them.</li>
+        </ul>
+        <h3>Try not to say</h3>
+        <ul class="advice avoid">
+          <li>"They're in a better place."</li>
+          <li>"Everything happens for a reason."</li>
+          <li>"I know exactly how you feel."</li>
+          <li>"At least…" (anything that starts this way)</li>
+          <li>"You should be feeling better by now." Grief has no deadline.</li>
+        </ul>
+        <h3>Look after yourself</h3>
+        <ul class="advice">
+          <li>It's okay to say "I need to stop here" and end the call kindly.</li>
+          <li>Take a moment before opening your line again.</li>
+        </ul>
+        <div class="safety">
+          <h3>If they say they want to die or aren't safe</h3>
+          <p>Stay calm. It's okay to ask directly: <em>"Are you thinking about ending your life?"</em>
+            Asking does not put the idea in their head. Encourage them to contact a crisis line
+            or emergency services now. You are not expected to handle this alone.</p>
+          <a href="https://findahelpline.com" target="_blank" rel="noopener">Find a crisis line</a>
+        </div>
+      </section>
+      <p class="credit" id="guide-credit">Written in plain language by the Kindred team. Awaiting review by a qualified grief professional.</p>
+    </aside>
+
+    <!-- Photo credits -->
+    <div class="sheet" id="credits" hidden role="dialog" aria-labelledby="credits-title">
+      <div class="sheet-body credits-body">
+        <h2 id="credits-title">Photo credits</h2>
+        <ul id="credits-list"></ul>
+        <button class="secondary" id="credits-close">Close</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+    <audio id="remote-audio" autoplay playsinline></audio>
+  </main>
+  <script src="operator.js"></script>
+  <script src="resources.js"></script>
+  <script src="scene.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

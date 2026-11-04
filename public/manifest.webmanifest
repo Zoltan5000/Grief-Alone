@@ -1,0 +1,9 @@
+{
+  "name": "Kindred",
+  "short_name": "Kindred",
+  "description": "Talk anonymously with someone who is grieving too.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1220",
+  "theme_color": "#1f5fae"
+}

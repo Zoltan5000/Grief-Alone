@@ -1,0 +1,17 @@
+{
+  "name": "kindred",
+  "version": "1.0.0",
+  "description": "Anonymous voice calls between people who are grieving.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}
